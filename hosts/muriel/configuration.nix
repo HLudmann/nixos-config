@@ -4,6 +4,7 @@
   imports =
     [ # Include the results of the hardware scan.
       ./hardware-configuration.nix
+      ../../modules/reasonable-defaults.nix
     ];
 
   # Bootloader.
