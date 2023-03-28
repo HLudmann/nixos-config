@@ -1,7 +1,3 @@
-# Edit this configuration file to define what should be installed on
-# your system.  Help is available in the configuration.nix(5) man page
-# and in the NixOS manual (accessible by running ‘nixos-help’).
-
 { config, pkgs, ... }:
 
 {
@@ -16,12 +12,8 @@
   boot.loader.efi.canTouchEfiVariables = true;
   boot.loader.efi.efiSysMountPoint = "/boot/efi";
 
-  networking.hostName = "muriel"; # Define your hostname.
+  networking.hostName = "muriel";
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
-
-  # Configure network proxy if necessary
-  # networking.proxy.default = "http://user:password@proxy:port/";
-  # networking.proxy.noProxy = "127.0.0.1,localhost,internal.domain";
 
   # Enable networking
   networking.networkmanager.enable = true;
@@ -31,17 +23,18 @@
 
   # Select internationalisation properties.
   i18n.defaultLocale = "en_GB.UTF-8";
-
-  i18n.extraLocaleSettings = {
-    LC_ADDRESS = "fr_FR.UTF-8";
-    LC_IDENTIFICATION = "fr_FR.UTF-8";
-    LC_MEASUREMENT = "fr_FR.UTF-8";
-    LC_MONETARY = "fr_FR.UTF-8";
-    LC_NAME = "fr_FR.UTF-8";
-    LC_NUMERIC = "fr_FR.UTF-8";
-    LC_PAPER = "fr_FR.UTF-8";
-    LC_TELEPHONE = "fr_FR.UTF-8";
-    LC_TIME = "fr_FR.UTF-8";
+  i18n.extraLocaleSettings = let
+    nativeLang = "fr_FR.UTF-8";
+  in {
+    LC_ADDRESS = nativeLang;
+    LC_IDENTIFICATION = nativeLang;
+    LC_MEASUREMENT = nativeLang;
+    LC_MONETARY = nativeLang;
+    LC_NAME = nativeLang;
+    LC_NUMERIC = nativeLang;
+    LC_PAPER = nativeLang;
+    LC_TELEPHONE = nativeLang;
+    LC_TIME = nativeLang;
   };
 
   # Enable the X11 windowing system.
@@ -58,7 +51,11 @@
   };
 
   # Configure console keymap
-  console.keyMap = "fr";
+  console = {
+    font = "FiraCode Nerd Font";
+    keyMap = "fr";
+    useXkbConfig = true; # use xkbOptions for keymap in tty
+  };
 
   # Enable CUPS to print documents.
   services.printing.enable = true;
@@ -103,12 +100,12 @@
       gh
       go
       gnumake
+      neovim
       nodejs
       python3
       rustup
       seafile-client
       terraform
-      vscode
       wezterm
       wget
       zsh
@@ -145,7 +142,7 @@
   # List packages installed in system profile. To search, run:
   # $ nix search wget
   environment.systemPackages = with pkgs; [
-    neovim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
+    vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
     fprintd
     direnv
     nix-direnv
