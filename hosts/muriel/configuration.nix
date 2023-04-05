@@ -144,6 +144,9 @@
     NPM_CONFIG_PREFIX = "~/.npm-global";
   };
 
+  # Enable Netdata
+  services.netdata.enable = true;
+
   # Direnv config
   nix.settings = {
     keep-outputs = true;
