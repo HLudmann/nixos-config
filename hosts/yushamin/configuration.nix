@@ -1,16 +1,15 @@
 { config, pkgs, ... }:
 let
-  unstable = import
-    (builtins.fetchTarball https://github.com/nixos/nixpkgs/tarball/master)
-    # reuse the current configuration
-    { config = config.nixpkgs.config; };
+  unstable = import <nixos-unstable> {};
 in
 {
+  disabledModules = [ "services/monitoring/netdata.nix" ];
   imports =
     [ # Include the results of the hardware scan.
-      ./hardware-configuration.nix
-      ../../modules/reasonable-defaults.nix
       <nixos-unstable/nixos/modules/services/monitoring/netdata.nix>
+      ./hardware-configuration.nix
+      # ../../modules/netdata.nix
+      ../../modules/reasonable-defaults.nix
     ];
 
   # Bootloader.
