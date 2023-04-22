@@ -6,5 +6,6 @@
 
   outputs = inputs: {
     nixosConfigurations.muriel = import ./hosts/muriel inputs;
+    nixosConfigurations.yushamin = import ./hosts/yushamin inputs;
   };
 }
