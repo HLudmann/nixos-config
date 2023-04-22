@@ -1,10 +1,16 @@
 { config, pkgs, ... }:
-
+let
+  unstable = import
+    (builtins.fetchTarball https://github.com/nixos/nixpkgs/tarball/master)
+    # reuse the current configuration
+    { config = config.nixpkgs.config; };
+in
 {
   imports =
     [ # Include the results of the hardware scan.
       ./hardware-configuration.nix
       ../../modules/reasonable-defaults.nix
+      <nixos-unstable/nixos/modules/services/monitoring/netdata.nix>
     ];
 
   # Bootloader.
@@ -122,14 +128,14 @@
   ];
 
   # Enable Netdata
+  # Use latest version
+  nixpkgs.config.packageOverrides = pkgs: {
+    inherit (unstable) netdata;
+  };
   services.netdata = {
     enable = true;
-
     config = {
       global = {
-        # uncomment to reduce memory to 32 MB
-        #"page cache size" = 32;
-
         # update interval
         "update every" = 15;
       };
