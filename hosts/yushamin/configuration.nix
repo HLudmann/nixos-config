@@ -8,7 +8,6 @@ in
     [ # Include the results of the hardware scan.
       <nixos-unstable/nixos/modules/services/monitoring/netdata.nix>
       ./hardware-configuration.nix
-      # ../../modules/netdata.nix
       ../../modules/reasonable-defaults.nix
     ];
 
