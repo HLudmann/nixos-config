@@ -1,6 +1,13 @@
 { config, pkgs, ... }:
 let
   unstable = import <nixos-unstable> {};
+  nvidia-offload = pkgs.writeShellScriptBin "nvidia-offload" ''
+    export __NV_PRIME_RENDER_OFFLOAD=1
+    export __NV_PRIME_RENDER_OFFLOAD_PROVIDER=NVIDIA-G0
+    export __GLX_VENDOR_LIBRARY_NAME=nvidia
+    export __VK_LAYER_NV_optimus=NVIDIA_only
+    exec "$@"
+  '';
 in
 {
   disabledModules = [ "services/monitoring/netdata.nix" ];
@@ -42,6 +49,18 @@ in
 
   # Enable the X11 windowing system.
   services.xserver.enable = true;
+  
+  # Enable Nvidia drivers
+  services.xserver.videoDrivers = [ "nvidia" ];
+  hardware.nvidia.prime = {
+    offload.enable = true;
+
+    # Bus ID of the Intel GPU. You can find it using lspci, either under 3D or VGA
+    intelBusId = "PCI:0:2:0";
+
+    # Bus ID of the NVIDIA GPU. You can find it using lspci, either under 3D or VGA
+    nvidiaBusId = "PCI:1:0:0";
+  };
 
   # Enable the KDE Plasma Desktop Environment.
   services.xserver.displayManager.sddm.enable = true;
@@ -86,7 +105,6 @@ in
     isNormalUser = true;
     description = "hldmna";
     extraGroups = [ "networkmanager" "wheel" "docker" ];
-    shell = pkgs.zsh;
     packages = with pkgs; [
       btop
       firefox
@@ -123,6 +141,9 @@ in
     ark
     _7zz
     just
+    cudatoolkit
+    nvidia-offload
+    python310
   ];
 
   # Enable Netdata
@@ -141,6 +162,16 @@ in
         # enable machine learning
         "enabled" = "yes";
       };
+    };
+    configDir = {
+      "python.d.conf" = pkgs.writeText "python.d.conf" ''
+        nvidia_smi: yes
+      '';
+      "python.d/nvidia_smi.conf" = pkgs.writeText "python.d/nvidia_smi.conf" ''
+        loop_mode    : yes
+        poll_seconds : 1
+        exclude_zero_memory_users : yes
+      '';
     };
   };
 
