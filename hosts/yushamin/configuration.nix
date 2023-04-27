@@ -1,19 +1,16 @@
-{ config, pkgs, ... }:
+{ config, pkgs, unstablePkgs, unstableSys, ... }:
 let
-  unstable = import <nixos-unstable> {};
   nvidia-offload = pkgs.writeShellScriptBin "nvidia-offload" ''
-    export __NV_PRIME_RENDER_OFFLOAD=1
-    export __NV_PRIME_RENDER_OFFLOAD_PROVIDER=NVIDIA-G0
-    export __GLX_VENDOR_LIBRARY_NAME=nvidia
+    export __NV_PRIME_RENDER_OFFLOAD=1 export __NV_PRIME_RENDER_OFFLOAD_PROVIDER=NVIDIA-G0 export __GLX_VENDOR_LIBRARY_NAME=nvidia
     export __VK_LAYER_NV_optimus=NVIDIA_only
     exec "$@"
   '';
 in
 {
-  disabledModules = [ "services/monitoring/netdata.nix" ];
+  # disabledModules = [ "services/monitoring/netdata.nix" ];
   imports =
     [ # Include the results of the hardware scan.
-      <nixos-unstable/nixos/modules/services/monitoring/netdata.nix>
+      # "${unstableSys}/nixos/modules/services/monitoring/netdata.nix"
       ./hardware-configuration.nix
       ../../modules/reasonable-defaults.nix
     ];
@@ -165,10 +162,8 @@ in
 
   # Enable Netdata
   # Use latest version
-  nixpkgs.config.packageOverrides = pkgs: {
-    inherit (unstable) netdata;
-  };
   services.netdata = {
+    package = unstablePkgs.netdata;
     enable = true;
     config = {
       global = {
