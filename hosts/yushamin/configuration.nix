@@ -46,7 +46,7 @@ in
     allowedUDPPorts = [ config.services.tailscale.port ];
 
     # allow you to SSH in over the public internet
-    allowedTCPPorts = [ 22 ];
+    allowedTCPPorts = [22 80 443];
   };
 
   # Set your time zone.
@@ -223,6 +223,14 @@ in
       # otherwise authenticate with tailscale
       ${tailscale}/bin/tailscale up -authkey $(cat ${config.sops.secrets.tailscale-authkey.path})
     '';
+  };
+
+  # Enable Traefik
+  services.traefik = {
+    enable = true;
+    package = unstablePkgs.traefik;
+    group = "docker";
+    staticConfigFile = "/etc/traefik/traefik.yml";
   };
 
   system.stateVersion = "22.11";
