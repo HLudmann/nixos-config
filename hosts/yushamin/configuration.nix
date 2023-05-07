@@ -205,6 +205,7 @@ in
 
   # Enable Tailscale
   services.tailscale.enable = true;
+  services.tailscale.package = pkgs.tailscale;
   sops.secrets.tailscale-authkey = {};
   systemd.services.tailscale-autoconnect = {
     description = "Automatic connection to Tailscale";
