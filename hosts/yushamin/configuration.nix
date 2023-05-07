@@ -1,5 +1,10 @@
-{ config, pkgs, unstablePkgs, unstableSys, ... }:
-let
+{
+  config,
+  pkgs,
+  unstablePkgs,
+  unstableSys,
+  ...
+}: let
   nvidia-offload = pkgs.writeShellScriptBin "nvidia-offload" ''
     export __NV_PRIME_RENDER_OFFLOAD=1
     export __NV_PRIME_RENDER_OFFLOAD_PROVIDER=NVIDIA-G0
@@ -7,15 +12,12 @@ let
     export __VK_LAYER_NV_optimus=NVIDIA_only
     exec "$@"
   '';
-in
-{
-  # disabledModules = [ "services/monitoring/netdata.nix" ];
-  imports =
-    [ # Include the results of the hardware scan.
-      # "${unstableSys}/nixos/modules/services/monitoring/netdata.nix"
-      ./hardware-configuration.nix
-      ../../modules/reasonable-defaults.nix
-    ];
+in {
+  imports = [
+    # Include the results of the hardware scan.
+    ./hardware-configuration.nix
+    ../../modules/reasonable-defaults.nix
+  ];
 
   # sops
   sops.defaultSopsFile = ./secrets.yaml;
@@ -32,7 +34,7 @@ in
 
   # Enable networking
   networking.networkmanager.enable = true;
-  
+
   # Enable firewall
   networking.firewall = {
     # enable the firewall
@@ -43,7 +45,7 @@ in
     trustedInterfaces = [ "tailscale0" ];
 
     # allow the Tailscale UDP port through the firewall
-    allowedUDPPorts = [ config.services.tailscale.port ];
+    allowedUDPPorts = [config.services.tailscale.port];
 
     # allow you to SSH in over the public internet
     allowedTCPPorts = [22 80 443];
@@ -70,7 +72,7 @@ in
 
   # Enable the X11 windowing system.
   services.xserver.enable = true;
-  
+
   # Enable Nvidia drivers
   services.xserver.videoDrivers = ["nvidia"];
   hardware.opengl.driSupport32Bit = true;
@@ -94,10 +96,10 @@ in
     layout = "fr";
     xkbVariant = "";
   };
-  
+
   # instal font
   fonts.fonts = with pkgs; [
-    (nerdfonts.override { fonts = [ "FiraCode" ]; })
+    (nerdfonts.override {fonts = ["FiraCode"];})
   ];
 
   # Configure console keymap
@@ -133,7 +135,7 @@ in
   users.users.hldmna = {
     isNormalUser = true;
     description = "hldmna";
-    extraGroups = [ "networkmanager" "wheel" "docker" ];
+    extraGroups = ["networkmanager" "wheel" "docker"];
     packages = with pkgs; [
       btop
       firefox
@@ -211,9 +213,9 @@ in
     description = "Automatic connection to Tailscale";
 
     # make sure tailscale is running before trying to connect to tailscale
-    after = [ "network-pre.target" "tailscale.service" ];
-    wants = [ "network-pre.target" "tailscale.service" ];
-    wantedBy = [ "multi-user.target" ];
+    after = ["network-pre.target" "tailscale.service"];
+    wants = ["network-pre.target" "tailscale.service"];
+    wantedBy = ["multi-user.target"];
 
     # set this service as a oneshot job
     serviceConfig.Type = "oneshot";

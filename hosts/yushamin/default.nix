@@ -1,6 +1,10 @@
-{ system-nixpkgs, system-unstable, nixos-hardware, ... }:
-
-let
+{
+  system-nixpkgs,
+  system-unstable,
+  nixos-hardware,
+  sops-nix,
+  ...
+}: let
   system = "x86_64-linux";
 in
   system-nixpkgs.lib.nixosSystem {

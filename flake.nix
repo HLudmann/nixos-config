@@ -9,5 +9,6 @@
   outputs = inputs: {
     nixosConfigurations.muriel = import ./hosts/muriel inputs;
     nixosConfigurations.yushamin = import ./hosts/yushamin inputs;
+    formatter.x86_64-linux = inputs.system-nixpkgs.legacyPackages.x86_64-linux.alejandra;
   };
 }

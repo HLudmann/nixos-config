@@ -1,11 +1,13 @@
-{ config, pkgs, ... }:
-
 {
-  imports =
-    [ # Include the results of the hardware scan.
-      ./hardware-configuration.nix
-      ../../modules/reasonable-defaults.nix
-    ];
+  config,
+  pkgs,
+  ...
+}: {
+  imports = [
+    # Include the results of the hardware scan.
+    ./hardware-configuration.nix
+    ../../modules/reasonable-defaults.nix
+  ];
 
   # Bootloader.
   boot.loader.systemd-boot.enable = true;
@@ -49,10 +51,10 @@
     layout = "fr";
     xkbVariant = "";
   };
-  
+
   # instal font
   fonts.fonts = with pkgs; [
-    (nerdfonts.override { fonts = [ "FiraCode" ]; })
+    (nerdfonts.override {fonts = ["FiraCode"];})
   ];
 
   # Configure console keymap
@@ -82,7 +84,7 @@
   users.users.hldmna = {
     isNormalUser = true;
     description = "hldmna";
-    extraGroups = [ "networkmanager" "wheel" "docker" ];
+    extraGroups = ["networkmanager" "wheel" "docker"];
     shell = pkgs.zsh;
     packages = with pkgs; [
       btop
@@ -117,7 +119,7 @@
     };
     ohMyZsh = {
       enable = true;
-      plugins = [ "git" "golang" "rust" "thefuck" "systemadmin"];
+      plugins = ["git" "golang" "rust" "thefuck" "systemadmin"];
       theme = "crunch";
       customPkgs = with pkgs; [
         zsh-git-prompt
@@ -135,7 +137,7 @@
 
   # List packages installed in system profile.
   environment.systemPackages = with pkgs; [
-    vim 
+    vim
     direnv
     nix-direnv
   ];
@@ -156,7 +158,7 @@
     "/share/nix-direnv"
   ];
   nixpkgs.overlays = [
-    (self: super: { nix-direnv = super.nix-direnv.override { enableFlakes = true; }; } )
+    (self: super: {nix-direnv = super.nix-direnv.override {enableFlakes = true;};})
   ];
 
   system.stateVersion = "22.11";
