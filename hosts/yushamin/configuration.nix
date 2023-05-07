@@ -72,7 +72,8 @@ in
   services.xserver.enable = true;
   
   # Enable Nvidia drivers
-  services.xserver.videoDrivers = [ "nvidia" ];
+  services.xserver.videoDrivers = ["nvidia"];
+  hardware.opengl.driSupport32Bit = true;
   hardware.nvidia.prime = {
     offload.enable = true;
 
@@ -117,7 +118,14 @@ in
   };
 
   # Enable docker
-  virtualisation.docker.enable = true;
+  virtualisation.docker = {
+    enable = true;
+    enableNvidia = true;
+    daemon.settings = {
+      fixed-cidr-v6 = "fd00::/80";
+      ipv6 = true;
+    };
+  };
 
   services.flatpak.enable = true;
 
