@@ -1,0 +1,17 @@
+# This example uses YAML anchors which allows reuse of multiple keys 
+# without having to repeat yourself.
+# Also see https://github.com/Mic92/dotfiles/blob/master/nixos/.sops.yaml
+# for a more complex example.
+keys:
+  # Users
+  - &users:
+    - &hldmna age1hl7rhfphv2jlxvputyr4nn44jwwrfm2prfrae4dtq5m4nl7mc3dqnv6p93
+  - &hosts:
+    - &yushamin age1nlaf8whj9mqajs28t7l8zqgqf6542ent497x7d8fp72qapg0yf5smv65th
+      
+creation_rules:
+  - path_regex: hosts/yushamin/secrets.yaml$
+    key_groups:
+      - age:
+        - *hldmna
+        - *yushamin

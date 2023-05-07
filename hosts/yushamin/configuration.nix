@@ -1,7 +1,9 @@
 { config, pkgs, unstablePkgs, unstableSys, ... }:
 let
   nvidia-offload = pkgs.writeShellScriptBin "nvidia-offload" ''
-    export __NV_PRIME_RENDER_OFFLOAD=1 export __NV_PRIME_RENDER_OFFLOAD_PROVIDER=NVIDIA-G0 export __GLX_VENDOR_LIBRARY_NAME=nvidia
+    export __NV_PRIME_RENDER_OFFLOAD=1
+    export __NV_PRIME_RENDER_OFFLOAD_PROVIDER=NVIDIA-G0
+    export __GLX_VENDOR_LIBRARY_NAME=nvidia
     export __VK_LAYER_NV_optimus=NVIDIA_only
     exec "$@"
   '';
@@ -14,6 +16,12 @@ in
       ./hardware-configuration.nix
       ../../modules/reasonable-defaults.nix
     ];
+
+  # sops
+  sops.defaultSopsFile = ./secrets.yaml;
+  sops.age.sshKeyPaths = ["/etc/ssh/ssh_host_ed25519_key"];
+  sops.age.keyFile = "/var/lib/sops-nix/key.txt";
+  sops.age.generateKey = true;
 
   # Bootloader.
   boot.loader.systemd-boot.enable = true;
@@ -189,6 +197,7 @@ in
 
   # Enable Tailscale
   services.tailscale.enable = true;
+  sops.secrets.tailscale-authkey = {};
   systemd.services.tailscale-autoconnect = {
     description = "Automatic connection to Tailscale";
 
@@ -212,7 +221,7 @@ in
       fi
 
       # otherwise authenticate with tailscale
-      ${tailscale}/bin/tailscale up -authkey tskey-auth-change-me
+      ${tailscale}/bin/tailscale up -authkey $(cat ${config.sops.secrets.tailscale-authkey.path})
     '';
   };
 

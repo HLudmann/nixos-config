@@ -18,8 +18,28 @@
     "root": {
       "inputs": {
         "nixos-hardware": "nixos-hardware",
+        "sops-nix": "sops-nix",
         "system-nixpkgs": "system-nixpkgs",
         "system-unstable": "system-unstable"
+      }
+    },
+    "sops-nix": {
+      "inputs": {
+        "nixpkgs": "nixpkgs",
+        "nixpkgs-stable": "nixpkgs-stable"
+      },
+      "locked": {
+        "lastModified": 1683428115,
+        "narHash": "sha256-sxkM4upCCdsaWVpDWxYgQXooobex8QHbFkGj40Uf9uQ=",
+        "owner": "Mic92",
+        "repo": "sops-nix",
+        "rev": "fd2d857ce2450a3ba5700d1e95eb110070e0dbc3",
+        "type": "github"
+      },
+      "original": {
+        "owner": "Mic92",
+        "repo": "sops-nix",
+        "type": "github"
       }
     },
     "system-nixpkgs": {
