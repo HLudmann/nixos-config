@@ -42,7 +42,7 @@ in {
     checkReversePath = "loose";
 
     # always allow traffic from your Tailscale network
-    trustedInterfaces = [ "tailscale0" ];
+    trustedInterfaces = ["tailscale0"];
 
     # allow the Tailscale UDP port through the firewall
     allowedUDPPorts = [config.services.tailscale.port];
@@ -237,11 +237,85 @@ in {
   };
 
   # Enable Traefik
+  sops.secrets.traefik-cert = {owner = "traefik";};
+  sops.secrets.traefik-key = {owner = "traefik";};
   services.traefik = {
     enable = true;
     package = unstablePkgs.traefik;
     group = "docker";
-    staticConfigFile = "/etc/traefik/traefik.yml";
+    staticConfigOptions = {
+      api = {
+        dashboard = true;
+        insecure = false;
+      };
+      entryPoints = {
+        web = {
+          address = ":80";
+          http.redirections.entryPoint = {
+            to = "websecure";
+            scheme = "https";
+          };
+          forwardedHeaders.insecure = false;
+          forwardedHeaders.trustedIPs=["10.0.0.0/8" "172.16.0.0/16" "192.168.0.0/16" "fc00::/7"];
+          proxyProtocol.insecure = false;
+          proxyProtocol.trustedIPs=["10.0.0.0/8" "172.16.0.0/16" "192.168.0.0/16" "fc00::/7"];
+        };
+        websecure = {
+          address = ":443";
+          http = {
+            tls = true;
+          };
+          forwardedHeaders.insecure = false;
+          forwardedHeaders.trustedIPs=["10.0.0.0/8" "172.16.0.0/16" "192.168.0.0/16" "fc00::/7"];
+          proxyProtocol.insecure = false;
+          proxyProtocol.trustedIPs=["10.0.0.0/8" "172.16.0.0/16" "192.168.0.0/16" "fc00::/7"];
+        };
+      };
+      log.level = "DEBUG";
+      accessLog = {};
+      providers.docker = {};
+    };
+    dynamicConfigOptions = {
+      http = {
+        middlewares = {
+          redirect-to-ts-net = {
+            redirectRegex = {
+              regex = "^https?://yushamin/(.*)";
+              replacement = ''https://yushamin.werewolf-bass.ts.net/''${1}'';
+              permanent = false;
+            };
+          };
+        };
+        routers = {
+          dashboard = {
+            rule = "Host(`yushamin.werewolf-bass.ts.net`) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))";
+            service = "api@internal";
+          };
+          to_ts_net = {
+            rule = "Host(`yushamin`)";
+            service = "noop@internal";
+            middlewares = ["redirect-to-ts-net"];
+          };
+        };
+      };
+      tls = {
+        certificates = [
+          {
+            certFile = config.sops.secrets.traefik-cert.path;
+            keyFile = config.sops.secrets.traefik-key.path;
+            stores = ["default"];
+          }
+        ];
+        stores = {
+          default = {
+            defaultCertificate = {
+              certFile = config.sops.secrets.traefik-cert.path;
+              keyFile = config.sops.secrets.traefik-key.path;
+            };
+          };
+        };
+      };
+    };
   };
 
   system.stateVersion = "22.11";
